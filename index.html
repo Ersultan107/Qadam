@@ -44,6 +44,7 @@ input{font:inherit;color:inherit}
 .phone{position:relative;flex:none;width:392px;height:min(844px,calc(100vh - 32px));border-radius:48px;background:var(--bg);
   border:1px solid #243858;box-shadow:0 0 0 9px #0a1220,0 0 0 10px #1a2a44,0 50px 140px rgba(30,100,200,.28);overflow:hidden;isolation:isolate}
 .sb{position:absolute;z-index:40;top:0;left:0;right:0;height:46px;padding:16px 30px 0;display:flex;justify-content:space-between;font-weight:700;font-size:14px;pointer-events:none}
+.phone:not([data-screen=splash]):not([data-screen=cam]):not([data-screen=place]):not([data-screen=map]):not([data-screen=sos]) .sb{background:linear-gradient(var(--bg) 62%,transparent)}
 .sb .r{display:flex;gap:6px;align-items:center}
 .phone[data-screen=splash] .sb,.phone[data-screen=cam] .sb{color:#fff}
 
@@ -106,6 +107,9 @@ h2.sec small{font-size:13px;color:var(--mut);font-weight:600}
 .feat .t b{font-size:21px;font-weight:800;display:block}
 .feat .t span{font-size:13px;color:#c2d1e6}
 .feat .chev{position:absolute;z-index:2;right:14px;bottom:20px}
+.ph{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .7s}
+.ph.in{opacity:1}
+.th,.ava .sc{position:relative}
 .sc svg,.th svg{display:block;width:100%;height:100%}
 
 .hscroll{display:flex;gap:12px;overflow-x:auto;margin:0 -20px;padding:0 20px 4px;scrollbar-width:none}
@@ -418,6 +422,7 @@ const ICONS={
  mountain:'<path d="m8 3 4 8 5-5 5 15H2z"/>',
  landmark:'<path d="M3 22h18M6 18v-7M10 18v-7M14 18v-7M18 18v-7M12 2 20 7H4z"/>',
  tree:'<path d="m17 14 3 3.3a1 1 0 0 1-.7 1.7H4.7a1 1 0 0 1-.7-1.7L7 14h-.3a1 1 0 0 1-.7-1.7L9 9h-.2A1 1 0 0 1 8 7.3L12 3l4 4.3a1 1 0 0 1-.8 1.7H15l3 3.3a1 1 0 0 1-.7 1.7H17Z"/><path d="M12 22v-3"/>',
+ water:'<path d="M12 2.7C9 7 6 10 6 14a6 6 0 0 0 12 0c0-4-3-7-6-11.3z"/>',
  fork:'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
  home:'<path d="m3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>',
  map:'<path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/>',
@@ -563,21 +568,18 @@ const PLACES=[
  {id:'charyn',name:'Чарынский каньон',sub:'Долина замков',short:'Красные скалы возрастом миллионы лет',km:200,dur:'3 ч 30 мин',visit:'4–6 ч',lv:'hard',rate:4.9,rev:'7 120',stat:['Лучший сезон','апр–окт'],modes:['auto'],tags:['Природа','Достопримечательности'],kind:'canyon',seed:37,
   desc:'Чарынский каньон — один из самых впечатляющих природных памятников Казахстана. Самая популярная часть — Долина замков, где ветер и вода за миллионы лет вырезали в красных скалах причудливые башни и арки.',
   tip:'Днём в каньоне жарко, а тени почти нет. Возьмите воду, дрон покажет самую короткую тропу до реки.'},
- {id:'kolsai',name:'Кольсайские озёра',sub:'Жемчужина Тянь-Шаня',short:'Три озера среди еловых лесов',km:300,dur:'6 ч',visit:'1–2 дня',lv:'hard',rate:4.9,rev:'8 340',stat:['Лучший сезон','май–сен'],modes:['auto','walk'],tags:['Горы','Природа'],kind:'lake',seed:52,
+ {id:'kolsai',name:'Кольсайские озёра',sub:'Жемчужина Тянь-Шаня',short:'Три озера среди еловых лесов',km:300,dur:'6 ч',visit:'1–2 дня',lv:'hard',rate:4.9,rev:'8 340',stat:['Лучший сезон','май–сен'],modes:['auto','walk'],tags:['Горы','Природа','Озёра'],kind:'lake',seed:52,
   desc:'Кольсайские озёра — три горных озера в еловых лесах Тянь-Шаня. Нижнее озеро лежит на высоте около 1800 м, к остальным ведут пешие тропы. Здесь особенно красивы рассветы над водой.',
   tip:'Погода в горах меняется быстро. В горной части дрон остаётся рядом и покажет безопасное направление.'},
- {id:'bao',name:'Большое Алматинское озеро',sub:'Бирюзовое озеро в горах',short:'Высокогорное озеро над городом',km:28,dur:'50 мин',visit:'3–5 ч',lv:'mid',rate:4.8,rev:'10 260',stat:['Высота','2511 м'],modes:['auto','walk'],tags:['Горы','Природа'],kind:'lake',seed:64,
+ {id:'bao',name:'Большое Алматинское озеро',sub:'Бирюзовое озеро в горах',short:'Высокогорное озеро над городом',km:28,dur:'50 мин',visit:'3–5 ч',lv:'mid',rate:4.8,rev:'10 260',stat:['Высота','2511 м'],modes:['auto','walk'],tags:['Горы','Природа','Озёра'],kind:'lake',seed:64,
   desc:'Большое Алматинское озеро находится на высоте около 2500 м. Цвет воды меняется в течение дня от изумрудного до глубокого синего, а вокруг поднимаются заснеженные вершины.',
   tip:'Самое красивое освещение утром. К вечеру с гор быстро спускается холод.'},
  {id:'koktobe',name:'Кок-Тобе',sub:'Гора над городом',short:'Панорама Алматы с канатной дороги',km:5.2,dur:'15 мин',visit:'1–2 ч',lv:'easy',rate:4.6,rev:'15 030',stat:['Высота','1100 м'],modes:['walk','auto'],tags:['Достопримечательности'],kind:'city',seed:71,tower:1,
   desc:'Кок-Тобе — холм в центре Алматы. На вершину поднимается канатная дорога, а наверху есть смотровая площадка, кафе и телебашня. Вечером отсюда особенно красивы огни города.',
-  tip:'Лучшее время — за час до заката. Дрон сделает фото на фоне городских огней.'},
- {id:'bazaar',name:'Зелёный базар',sub:'Главный рынок города',short:'Специи, сухофрукты и национальная кухня',km:2.1,dur:'10 мин',visit:'1 ч',lv:'easy',rate:4.7,rev:'6 480',stat:['Лучшее время','утро'],modes:['walk'],tags:['Еда','Достопримечательности'],kind:'city',seed:83,
-  desc:'Зелёный базар — один из самых известных рынков Алматы. Здесь продают специи, сухофрукты, орехи, мёд и молочные продукты, а в рядах можно попробовать национальные блюда.',
-  tip:'Дрон переведёт разговор с продавцом и подскажет, как называются местные продукты.'}
+  tip:'Лучшее время — за час до заката. Дрон сделает фото на фоне городских огней.'}
 ];
 const LV={easy:'Лёгкий',mid:'Средний',hard:'Сложный'};
-const CATS=[['Горы','mountain','Горы'],['Достопримечательности','landmark','Достопримечательности'],['Природа','tree','Природа'],['Еда','fork','Еда']];
+const CATS=[['Горы','mountain','Горы'],['Достопримечательности','landmark','Достопримечательности'],['Природа','tree','Природа'],['Озёра','water','Озёра']];
 const STATIONS=[['Площадь Республики','320 м',3],['Нижняя станция Медеу','12 км',5],['Кок-Тобе','5 км',2]];
 const PHRASES=[
  {lang:'English',src:'Where is the nearest tea house?',ru:'Где ближайшая чайхана?',kz:'Ең жақын шайхана қайда?',l:'en-US'},
@@ -587,13 +589,40 @@ const PHRASES=[
 ];
 const S={drone:'idle',eta:0,escort:false,mode:'all',tag:null,q:'',place:'medeu',routed:false,tl:'ru',phrase:0,shots:0,fav:{},photosScene:null};
 const P=id=>PLACES.find(p=>p.id===id);
+const photo=(id,alt='')=>`<img class="ph" data-ph="${id}" alt="${alt}" src="${id}.jpg" onload="this.classList.add('in')" onerror="phErr(this)">`;
+const pic=(p,W,H)=>scene(p.kind,p.seed,W,H,{tower:p.tower})+photo(p.id,p.name);
+/* Реальные фото: сначала файл рядом с index.html (например medeu.jpg), если его нет — главное фото статьи Википедии */
+const WIKI={medeu:'Medeu',shym:'Shymbulak',charyn:'Charyn_Canyon',kolsai:'Kolsai_Lakes',bao:'Big_Almaty_Lake',koktobe:'Kok-Tobe',splash:'Big_Almaty_Lake',camera:'Kolsai_Lakes'};
+const IMG={},FAIL={};
+function phErr(el){
+  const id=el.dataset.ph;
+  if(el.dataset.t){el.remove();return}
+  if(IMG[id]){el.dataset.t=1;el.src=IMG[id]}
+  else if(FAIL[id])el.remove();
+  else el.dataset.wait=1;
+}
+async function loadPhotos(){
+  await Promise.all(Object.entries(WIKI).map(async([id,title])=>{
+    try{
+      const r=await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+title);
+      const j=await r.json(),o=j.originalimage,th=j.thumbnail;
+      if(!o)throw 0;
+      let u=o.source;
+      if(th&&o.width>=1000)u=th.source.replace(/\/\d+px-/,'/960px-');
+      IMG[id]=u;
+      $$('.ph[data-wait]').filter(e=>e.dataset.ph===id).forEach(e=>{delete e.dataset.wait;e.dataset.t=1;e.src=u});
+    }catch(_){
+      FAIL[id]=1;$$('.ph[data-wait]').filter(e=>e.dataset.ph===id).forEach(e=>e.remove());
+    }
+  }));
+}
 
 /* ================= build screens ================= */
 const app=$('#app');
 const hdBack=(title,right='')=>`<div class="hd"><div class="row"><button class="icb" data-back aria-label="Назад">${ic('back',24)}</button><b style="font-size:19px">${title}</b></div>${right}</div>`;
 
 function placeRow(p){
-  return `<button class="pl" data-place="${p.id}"><div class="th sc">${scene(p.kind,p.seed,300,300,{tower:p.tower})}</div>
+  return `<button class="pl" data-place="${p.id}"><div class="th sc">${pic(p,300,300)}</div>
   <div class="m"><b>${p.name}</b><div class="meta">${ic('clock',14)}<span>${p.km} км · ${p.dur}</span></div><span class="pill ${p.lv}">${ic(p.lv==='easy'?'check':p.lv==='mid'?'mountain':'warn',13,2)}${LV[p.lv]}</span></div>${ic('chev',20)}</button>`;
 }
 
@@ -610,9 +639,9 @@ app.innerHTML=`
     <div class="card near"><div class="ring"></div><img class="dimg" data-drone alt="Дрон QADAM">
       <div class="txt"><h3>QADAM рядом</h3><div class="st"><i class="dot" id="hdot"></i><span id="hst">Дрон доступен в 320 м</span></div>
       <button class="btn sm" id="hbtn" data-act="call">${ic('drone',18,2)}Вызвать</button></div></div>
-    <button class="feat" data-place="medeu"><div class="sc">${scene('lake',11)}</div><div class="t"><b>Медеу</b><span>Легендарный каток и горные пейзажи</span></div><span class="chev">${ic('chev',22)}</span></button>
+    <button class="feat" data-place="medeu"><div class="sc">${pic(P('medeu'),600,420)}</div><div class="t"><b>Медеу</b><span>Легендарный каток и горные пейзажи</span></div><span class="chev">${ic('chev',22)}</span></button>
     <h2 class="sec">Популярные маршруты<small></small></h2>
-    <div class="hscroll">${['shym','bao','charyn','kolsai','koktobe'].map(id=>{const p=P(id);return `<button class="pc" data-place="${id}"><div class="sc">${scene(p.kind,p.seed,300,380,{tower:p.tower})}</div><div class="t"><b>${p.name}</b><span>${ic('clock',12)}${p.dur}</span></div></button>`}).join('')}</div>
+    <div class="hscroll">${['shym','bao','charyn','kolsai','koktobe'].map(id=>{const p=P(id);return `<button class="pc" data-place="${id}"><div class="sc">${pic(p,300,380)}</div><div class="t"><b>${p.name}</b><span>${ic('clock',12)}${p.dur}</span></div></button>`}).join('')}</div>
     <h2 class="sec">Станции QADAM<small>Демо-данные</small></h2>
     ${STATIONS.map(s=>`<button class="stn" data-go="map"><span class="ib">${ic('drone',22)}</span><span class="m"><b>${s[0]}</b><span>${s[1]} от вас</span></span><span class="n">${s[2]} дрона<br><span style="color:var(--mut);font-weight:600">свободно</span></span></button>`).join('')}
   </div>
@@ -670,7 +699,7 @@ app.innerHTML=`
 
 <!-- CAMERA -->
 <section class="screen" id="s-cam">
-  <div class="cam-view"><div class="sc">${scene('lake',31,600,420)}</div></div>
+  <div class="cam-view"><div class="sc">${scene('lake',31,600,420)}${photo('camera')}</div></div>
   <div class="hud"><div class="top"><span class="rec" id="rec"><i></i><span id="rect">ФОТО</span></span><span>Выс. 12 м</span><span style="display:flex;gap:6px;align-items:center">${ic('battery',18)}91%</span></div>
     <div class="fr"><i></i><i></i><i></i><i></i></div><div class="cross"></div><div class="tele">43.157° N, 77.059° E<br>4K · 60 fps</div></div>
   <div class="camctl"><div class="modes"><button class="on" data-act="cmode" data-m="photo">Фото</button><button data-act="cmode" data-m="video">Видео</button></div>
@@ -682,7 +711,7 @@ app.innerHTML=`
 <section class="screen" id="s-profile">
   <div class="hd"><b style="font-size:24px">Профиль</b><button class="icb" data-act="soon" aria-label="Настройки">${ic('sliders',22)}</button></div>
   <div class="pad">
-    <div class="prof"><div class="ava sc">${scene('lake',11,200,200)}</div><div><b>Ersultan</b><span class="r">Путешественник</span><br><span class="pro">${LOGO(12)}QADAM Pro</span></div></div>
+    <div class="prof"><div class="ava sc">${pic(P('medeu'),200,200)}</div><div><b>Ersultan</b><span class="r">Путешественник</span><br><span class="pro">${LOGO(12)}QADAM Pro</span></div></div>
     <div class="menu">
       <button class="mi" data-go="places">${ic('route',22)}<b>Мои маршруты</b>${ic('chev',18,2,'chv')}</button>
       <button class="mi" data-act="favs">${ic('star',22)}<b>Избранные места</b>${ic('chev',18,2,'chv')}</button>
@@ -708,7 +737,7 @@ app.innerHTML=`
       <div><span class="ib">${ic('shield',22)}</span><span><b>Помощь, если турист потерялся</b><span>Связывается со службой помощи и передаёт координаты.</span></span></div>
       <div><span class="ib">${ic('camera',22)}</span><span><b>Фото и видео с воздуха</b><span>Снимает туриста на фоне гор и озёр.</span></span></div>
     </div>
-    <p class="note" style="text-align:center;margin-top:24px">Прототип · версия 0.1</p>
+    <p class="note" style="text-align:center;margin-top:24px">Фотографии мест: Википедия и Wikimedia Commons, свободные лицензии. Авторов можно посмотреть на странице каждого файла.<br>Прототип · версия 0.1</p>
   </div>
 </section>
 `;
@@ -723,7 +752,7 @@ $('#pl').innerHTML=LOGO(38);$('#pi1').innerHTML=ic('lang',18);$('#pi2').innerHTM
 
 /* splash */
 function buildSplash(){
-  $('#splash').innerHTML=`<div class="sc">${scene('lake',7,420,844)}</div><div class="lg">${LOGO(74)}<b>QADAM</b><span>Твой проводник по Казахстану</span></div><img class="fly" alt="" src="${DRONE}"><div class="ft">Природа. Люди. История.<div class="bar"><i></i></div></div>`;
+  $('#splash').innerHTML=`<div class="sc">${scene('lake',7,420,844)}${photo('splash')}</div><div class="lg">${LOGO(74)}<b>QADAM</b><span>Твой проводник по Казахстану</span></div><img class="fly" alt="" src="${DRONE}"><div class="ft">Природа. Люди. История.<div class="bar"><i></i></div></div>`;
 }
 
 /* ================= map ================= */
@@ -774,7 +803,7 @@ function drawRoute(){
 }
 function updateMapCard(){
   const p=P(S.place);
-  $('#mth').innerHTML=scene(p.kind,p.seed,300,240,{tower:p.tower});
+  $('#mth').innerHTML=pic(p,300,240);
   $('#mname').textContent=p.name;$('#mlab').textContent=p.name.length>16?p.name.slice(0,15)+'…':p.name;
   $('#mmeta').innerHTML=`${ic('clock',14)}<span>${p.km} км · ~${p.dur}</span>`;
   const b=$('#mbtn');
@@ -795,7 +824,7 @@ function renderPlaces(){
 function renderPlace(id){
   const p=P(id);S.place=id;
   $('#s-place').innerHTML=`
-  <div class="hero"><div class="sc">${scene(p.kind,p.seed,600,420,{tower:p.tower})}</div>
+  <div class="hero"><div class="sc">${pic(p,600,420)}</div>
     <div class="tb"><button class="icb bg" data-back aria-label="Назад">${ic('back',24)}</button><button class="icb bg" data-act="fav" aria-label="В избранное" id="favb" style="${S.fav[id]?'color:var(--acc)':''}">${ic('bookmark',22)}</button></div>
     <div class="tt"><h1>${p.name}</h1><div class="sb2">${p.sub}</div><div class="rate">${ic('star',18,1.4)}<b>${p.rate.toFixed(1)}</b><span>(${p.rev} отзывов)</span></div></div></div>
   <div class="pad">
@@ -989,6 +1018,7 @@ function boot(){
 }
 function restart(){closeSheet();boot()}
 $('#mapwrap').innerHTML=mapSVG();
+loadPhotos();
 boot();
 </script>
 </body>
